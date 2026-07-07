@@ -2,10 +2,12 @@
   "name": "customer-ui5",
   "version": "1.0.0",
   "dependencies": {
+    "@cap-js/hana": "^2",
     "@sap/cds": "^9"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2.4",
+    "@sap/cds-dk": "^9",
     "cds-plugin-ui5": "^0.17.4"
   },
   "scripts": {
@@ -19,7 +21,15 @@
         "credentials": {
           "url": "db/customer.db"
         }
+      },
+      "[production]": {
+        "db": {
+          "kind": "hana"
+        },
+          "auth": {
+          "kind": "dummy"
+        }
       }
     }
-}
+  }
 }

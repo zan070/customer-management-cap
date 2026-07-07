@@ -1,0 +1,44 @@
+_schema-version: 3.3.0
+ID: customer-ui5
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+        - npm --prefix app/customer-management-ui5 ci
+        - bash -c "cd app/customer-management-ui5 && npx ui5 build --clean-dest --dest ../../gen/srv/srv/app/customer-management-ui5"
+modules:
+  - name: customer-ui5-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: customer-ui5-db
+
+  - name: customer-ui5-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: customer-ui5-db
+
+resources:
+  - name: customer-ui5-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
